@@ -1,17 +1,20 @@
 
 package com.esprit.voyage.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.esprit.voyage.entity.*;
+import com.esprit.voyage.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.esprit.voyage.entity.Client;
-import com.esprit.voyage.entity.MyConstants;
-import com.esprit.voyage.entity.Reclamation;
-import com.esprit.voyage.entity.Voyage;
 import com.esprit.voyage.repository.VoyageRepository;
 
 @Service
@@ -50,18 +53,32 @@ public class VoyageService {
 	}
 
 	public String deleteVoyage(int id) {
-		if (voyageRepository.findById(id).isPresent()) {
-			voyageRepository.deleteById(id);
-			return "Voyage supprimé";
-		} else
-			return "Voyage non supprimé";
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetailsImpl privilge = (UserDetailsImpl) authentication.getPrincipal();
+		List<String> authorities = privilge.getAuthorities().stream().map(role -> new String(role.getAuthority()))
+				.collect(Collectors.toList());
+		for (String role : authorities) {
+			if (role.equals(ERole.ROLE_ADMIN.toString())||role.equals(ERole.ROLE_MODERATOR.toString())) {
+
+				if (voyageRepository.findById(id).isPresent()) {
+					voyageRepository.deleteById(id);
+					return "Voyage supprimé";
+				} else
+					return "Voyage non supprimé :  Voyage not found";
+
+			}
+			else return "The user " + privilge.getUsername() + " does't have the right to delete a voyage";
+		}
+		return null;
+
 	}
 
 	private void sendMailVoyage(Voyage voyage) throws Exception {
 
 		// Create a Simple MailMessage.
 		SimpleMailMessage message = new SimpleMailMessage();
-
+		message.setFrom(MyConstants.MY_EMAIL);
 		message.setTo(MyConstants.FRIEND_EMAIL);
 		message.setSubject("Voyage");
 		message.setText("Le Voyage de  : " + voyage.getLieuDepart() + " vers " + voyage.getLieuArrivee() + "\n"

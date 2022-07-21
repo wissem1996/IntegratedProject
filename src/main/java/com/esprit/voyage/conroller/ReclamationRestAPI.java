@@ -20,7 +20,7 @@ import com.esprit.voyage.entity.Reclamation;
 import com.esprit.voyage.service.ReclamationService;
 
 @RestController
-@RequestMapping(value = "/apig/reclamations")
+@RequestMapping(value = "/api/reclamations")
 public class ReclamationRestAPI {
 
 	@Autowired
