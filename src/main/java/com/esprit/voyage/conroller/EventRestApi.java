@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * @author mokgharbi
+ * @author sejaziri
  */
 @RestController
 @RequestMapping(value = "/api/events")
