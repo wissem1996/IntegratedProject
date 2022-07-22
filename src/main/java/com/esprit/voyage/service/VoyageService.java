@@ -39,13 +39,21 @@ public class VoyageService {
 	public Voyage updateVoyage(int id, Voyage newVoyage) {
 		if (voyageRepository.findById(id).isPresent()) {
 			Voyage existingVoyage = voyageRepository.findById(id).get();
+			if((newVoyage.getDateDepart()!=null))
 			existingVoyage.setDateDepart(newVoyage.getDateDepart());
+			if((newVoyage.getDateArrivee()!=null))
 			existingVoyage.setDateArrivee(newVoyage.getDateArrivee());
+			if((newVoyage.getLieuDepart()!=null))
 			existingVoyage.setLieuDepart(newVoyage.getLieuDepart());
+			if((newVoyage.getLieuArrivee()!=null))
 			existingVoyage.setLieuArrivee(newVoyage.getLieuArrivee());
+			if((newVoyage.getDescription()!=null))
 			existingVoyage.setDescription(newVoyage.getDescription());
+			if((newVoyage.getObjectif()!=null))
 			existingVoyage.setObjectif(newVoyage.getObjectif());
+			if((newVoyage.getCompagnie()!=null))
 			existingVoyage.setCompagnie(newVoyage.getCompagnie());
+			if((newVoyage.getTarif()!=0.0))
 			existingVoyage.setTarif(newVoyage.getTarif());
 			return voyageRepository.save(existingVoyage);
 		} else
@@ -118,7 +126,23 @@ public class VoyageService {
 		}
 		return str.toString() ;
 	}
-	
+	public List<Voyage> filter(String key , String value) {
+		StringBuilder str = new StringBuilder();
+		int nb=0;
+		if (key.equals("lieuDepart")) {
+			List<Voyage> voyages =voyageRepository.listVoyageDepart(value);
+			return voyages;
+		}
+		else if (key.equals("lieuArrivee")) {
+			List<Voyage> voyages = voyageRepository.listVoyage(value);
+			return voyages;
+      	}
+		else if (key.equals("compagnie")) {
+			List<Voyage> voyages = voyageRepository.listVoyageByCompagnie(value);
+			return voyages;
+		}
+		return null;
+	}
 	
 	
 	

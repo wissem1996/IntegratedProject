@@ -64,7 +64,7 @@ public class SearchHistoryService {
         PhoneNumber from = new PhoneNumber(twilioConfiguration.getTrialNumber());
         for (Client client : clientList) {
             String message = "Hello " + client.getName() // to replace email by name
-                    + "\nWe inform you that that a new voyage is available in our plateform based to your search."
+                    + "\nWe inform you that a new voyage is available in our plateform based to your search."
                     + "\nYou can apply NOW!";
             if(client.getNumTel().toString()!=null){
                 if (isPhoneNumberValid(client.getNumTel().toString())) {

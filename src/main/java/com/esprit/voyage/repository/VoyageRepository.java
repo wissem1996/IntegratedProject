@@ -16,10 +16,11 @@ public interface VoyageRepository extends JpaRepository<Voyage, Integer> {
 	
 	@Query(value = "SELECT COUNT(*) FROM model_voyage  where lieu_depart = ?1 and date_depart > NOW()", nativeQuery = true)
 	int statVoyage(String key );
-	
+
 	@Query(value = "SELECT * FROM model_voyage  WHERE lieu_depart = ?1 and date_depart > NOW()", nativeQuery = true)
 	List<Voyage> listVoyageDepart(String depart);
-	
+	@Query(value = "SELECT * FROM model_voyage  WHERE compagnie = ?1 and date_depart > NOW()", nativeQuery = true)
+	List<Voyage> listVoyageByCompagnie(String compagnie);
 	
 	@Query(value = "SELECT COUNT(*) FROM model_voyage  where lieu_depart = ?1 and date_depart > NOW()", nativeQuery = true)
 	int statVoyageDepart(String key );

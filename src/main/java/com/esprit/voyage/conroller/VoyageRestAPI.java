@@ -1,7 +1,14 @@
 package com.esprit.voyage.controller;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import com.esprit.voyage.entity.Event;
+import com.esprit.voyage.entity.EventExcelExporter;
+import com.esprit.voyage.entity.VoyageExcelExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.HttpStatus;
@@ -20,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.esprit.voyage.entity.Voyage;
 import com.esprit.voyage.service.VoyageService;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/api/voyages")
@@ -54,8 +63,9 @@ public class VoyageRestAPI {
 	
 	@GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<List<Voyage>> getDestination(@RequestParam(value = "destination")  String destination) {
-		return new ResponseEntity<>(voyageService.VoyageParDestination(destination), HttpStatus.OK);
+	public ResponseEntity<List<Voyage>> filter(@RequestParam(value = "key")  String key ,
+										  @RequestParam(value = "value") String value) {
+		return new ResponseEntity<>(voyageService.filter(key,value), HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/stat", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,5 +74,20 @@ public class VoyageRestAPI {
 			@RequestParam(value = "value")String value) {
 		return new ResponseEntity<>(voyageService.getStatVoyage(key,value), HttpStatus.OK);
 	}
-	
+	@GetMapping("/export/excel")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		response.setContentType("application/octet-stream");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
+
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=events_" + currentDateTime + ".csv";
+		response.setHeader(headerKey, headerValue);
+
+		List<Voyage> listVoyage = voyageService.getAll();
+
+		VoyageExcelExporter excelExporter = new VoyageExcelExporter(listVoyage);
+
+		excelExporter.export(response);
+	}
 }
